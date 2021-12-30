@@ -31,17 +31,9 @@ public class TaskController {
         );
     }
 
-//    @GetMapping("getTasks")
-//    public List<TaskDto> getTasks() {
-//        return new ArrayList<>();
-//    }
-//    @GetMapping("getTask")
-//    public TaskDto getTask(Long taskId) {
-//        return new TaskDto(1L, "zadanie testowe", "test_content");
-//    }
     @DeleteMapping("deleteTask")
-    public void deleteTask(@RequestBody TaskDto taskDto) {
-        service.deleteTask(taskDto.getId());
+    public void deleteTask(@RequestParam Long taskId) {
+        service.deleteTask(taskId);
 
     }
     @PutMapping("updateTask")
