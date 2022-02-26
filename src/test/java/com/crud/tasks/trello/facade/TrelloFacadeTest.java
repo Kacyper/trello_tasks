@@ -1,62 +1,122 @@
 package com.crud.tasks.trello.facade;
 
-import com.crud.tasks.domain.Task;
-import com.crud.tasks.domain.TaskDto;
-import com.crud.tasks.mapper.TaskMapper;
+import com.crud.tasks.domain.*;
+import com.crud.tasks.mapper.TrelloMapper;
+import com.crud.tasks.service.TrelloService;
+import com.crud.tasks.trello.validator.TrelloValidator;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class TrelloFacadeTest {
 
-    @Autowired
-    private TaskMapper taskMapper;
+    @InjectMocks
+    private TrelloFacade trelloFacade;
+
+    @Mock
+    private TrelloService trelloService;
+
+    @Mock
+    private TrelloValidator trelloValidator;
+
+    @Mock
+    private TrelloMapper trelloMapper;
 
     @Test
-    public void testMapToTask() {
-        //Given
-        TaskDto taskDto = new TaskDto(1L, "test title", "test content");
+    public void shouldFetchEmptyList() {
+        // Given
+        List<TrelloListDto> trelloLists =
+                List.of(new TrelloListDto("1", "test_list", false));
 
-        //When
-        Task task = taskMapper.mapToTask(taskDto);
+        List<TrelloBoardDto> trelloBoards =
+                List.of(new TrelloBoardDto("1", "test", trelloLists));
 
-        //Then
-        assertNotNull(task);
-        assertEquals(1L, task.getId());
+        List<TrelloList> mappedTrelloLists =
+                List.of(new TrelloList("1", "test_list", false));
+
+        List<TrelloBoard> mappedTrelloBoards =
+                List.of(new TrelloBoard("1", "test", mappedTrelloLists));
+
+        when(trelloService.fetchTrelloBoards()).thenReturn(trelloBoards);
+        when(trelloMapper.mapToBoards(trelloBoards)).thenReturn(mappedTrelloBoards);
+        when(trelloMapper.mapToBoardsDto(anyList())).thenReturn(List.of());
+        when(trelloValidator.validateTrelloBoards(mappedTrelloBoards)).thenReturn(List.of());
+
+        // When
+        List<TrelloBoardDto> trelloBoardDto = trelloFacade.fetchTrelloBoards();
+
+        // Then
+        assertThat(trelloBoardDto).isNotNull();
+        assertThat(trelloBoardDto.size()).isEqualTo(0);
     }
 
     @Test
-    public void testMapToTaskDto() {
-        //Given
-        Task task = new Task(1L, "test title", "test content");
+    void shouldFetchTrelloBoards() {
+        // Given
+        List<TrelloListDto> trelloLists =
+                List.of(new TrelloListDto("1", "test_list", false));
 
-        //When
-        TaskDto taskDto = taskMapper.mapToTaskDto(task);
+        List<TrelloBoardDto> trelloBoards =
+                List.of(new TrelloBoardDto("1", "test", trelloLists));
 
-        //Then
-        assertNotNull(taskDto);
-        assertEquals(1L, taskDto.getId());
+        List<TrelloList> mappedTrelloLists =
+                List.of(new TrelloList("1", "test_list", false));
+
+        List<TrelloBoard> mappedTrelloBoards =
+                List.of(new TrelloBoard("1", "test", mappedTrelloLists));
+
+        when(trelloService.fetchTrelloBoards()).thenReturn(trelloBoards);
+        when(trelloMapper.mapToBoards(trelloBoards)).thenReturn(mappedTrelloBoards);
+        when(trelloMapper.mapToBoardsDto(anyList())).thenReturn(trelloBoards);
+        when(trelloValidator.validateTrelloBoards(mappedTrelloBoards)).thenReturn(mappedTrelloBoards);
+
+        // When
+        List<TrelloBoardDto> trelloBoardDtos = trelloFacade.fetchTrelloBoards();
+
+        // Then
+        assertThat(trelloBoardDtos).isNotNull();
+        assertThat(trelloBoardDtos.size()).isEqualTo(1);
+
+        trelloBoardDtos.forEach(trelloBoardDto -> {
+
+            assertThat(trelloBoardDto.getId()).isEqualTo("1");
+            assertThat(trelloBoardDto.getName()).isEqualTo("test");
+
+            trelloBoardDto.getLists().forEach(trelloListDto -> {
+                assertThat(trelloListDto.getId()).isEqualTo("1");
+                assertThat(trelloListDto.getName()).isEqualTo("test_list");
+                assertThat(trelloListDto.isClosed()).isFalse();
+            });
+        });
     }
 
     @Test
-    public void testToTaskDtoList() {
+    public void testCreatedCard() {
         //Given
-        Task task1 = new Task(1L, "test title 1", "test content 1");
-        Task task2 = new Task(2L, "test title 2", "test content 2");
-        List<Task> tasks = List.of(task1, task2);
+        TrelloCardDto trelloCardDto = new TrelloCardDto("name", "description", "pos", "id");
+        TrelloCard trelloCard = new TrelloCard("card name", "card description", "card pos", "card id");
+        CreatedTrelloCardDto createdTrelloCardDto = new CreatedTrelloCardDto("id", "name", "shorturl");
+
+        when(trelloMapper.mapToCard(trelloCardDto)).thenReturn(trelloCard);
+        when(trelloMapper.mapToCardDto(trelloCard)).thenReturn(trelloCardDto);
+        when(trelloService.createTrelloCard(trelloCardDto)).thenReturn(createdTrelloCardDto);
 
         //When
-        List<TaskDto> taskDtoList = taskMapper.mapToTaskDtoList(tasks);
+        CreatedTrelloCardDto card = trelloFacade.createCard(trelloCardDto);
 
         //Then
-        assertNotNull(taskDtoList);
-        assertEquals(2, taskDtoList.size());
+        assertNotNull(card);
+        assertEquals("id", card.getId());
     }
-
 }
