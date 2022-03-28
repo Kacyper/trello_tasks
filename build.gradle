@@ -17,6 +17,10 @@ jar {
 	enabled = false
 }
 
+springBoot {
+	mainClass = "com.crud.tasks.TasksApplication"
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
