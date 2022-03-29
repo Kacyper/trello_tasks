@@ -25,6 +25,6 @@ public class EmailScheduler {
                 .subject(SUBJECT)
                 .message("Currently in database you got: " + size + (size == 1 ? " task" : " tasks"))
                 .toCc(null)
-                .build(), true);
+                .build());
     }
 }

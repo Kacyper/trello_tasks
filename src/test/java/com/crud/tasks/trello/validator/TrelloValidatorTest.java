@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class TrelloValidatorTest {
     @Autowired
-    private TrelloValidator trelloValidator;
+    TrelloValidator trelloValidator;
 
     @Test
     public void testValidateCard() {

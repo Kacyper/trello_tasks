@@ -23,6 +23,9 @@ public class AdminConfig {
     @Value("${info.company.phone")
     private String companyPhone;
 
+    @Value("${info.company.email}")
+    private String companyEmail;
+
     @Value("${info.app.name}")
     private String appName;
 

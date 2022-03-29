@@ -1,6 +1,7 @@
 package com.crud.tasks.service;
 
 import com.crud.tasks.domain.Mail;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,8 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.time.Instant;
+import java.util.Date;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
-class SimpleEmailServiceTest {
+class SimpleEmailServiceTest{
 
     @InjectMocks
     private SimpleEmailService simpleEmailService;
@@ -19,6 +26,7 @@ class SimpleEmailServiceTest {
     private JavaMailSender javaMailSender;
 
     @Test
+    @Disabled
     public void shouldSendEmail() {
         //Given
         Mail mail = new Mail("test@test.com", "Test", "Test Message", "test@test.com");
@@ -28,11 +36,15 @@ class SimpleEmailServiceTest {
         mailMessage.setSubject(mail.getSubject());
         mailMessage.setText(mail.getMessage());
         mailMessage.setCc(mail.getToCc());
+        mailMessage.setReplyTo("test@test.com");
+        mailMessage.setBcc(mail.getToCc());
+        mailMessage.setFrom("Mike");
+        mailMessage.setSentDate(Date.from(Instant.now()));
 
         //When
-        simpleEmailService.send(mail, false);
+        simpleEmailService.send(mail);
 
         //Then
-//        verify(javaMailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(javaMailSender, times(1)).send(mailMessage);
     }
 }
