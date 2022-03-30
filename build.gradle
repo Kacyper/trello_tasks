@@ -18,9 +18,9 @@ jar {
 	enabled = false
 }
 
-springBoot {
-	mainClass = "com.crud.tasks.TasksApplication"
-}
+//springBoot {
+//	mainClass = "com.crud.tasks.TasksApplication"
+//}
 
 
 dependencies {
