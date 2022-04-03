@@ -5,6 +5,7 @@ import com.crud.tasks.repository.TaskRepository;
 import com.crud.tasks.service.SimpleEmailService;
 import com.crud.tasks.trello.config.AdminConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +17,7 @@ public class EmailScheduler {
     private final TaskRepository taskRepository;
     private final AdminConfig adminConfig;
 
-//    @Scheduled(fixedDelay = 10000000)
+    @Scheduled(fixedDelay = 10000000)
     public void sendInformationEmail() {
         long size = taskRepository.count();
         simpleEmailService.send(Mail.builder()

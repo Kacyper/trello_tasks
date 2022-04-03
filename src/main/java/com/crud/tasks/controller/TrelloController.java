@@ -28,5 +28,4 @@ import java.util.List;
         public CreatedTrelloCardDto createTrelloCard(@RequestBody TrelloCardDto trelloCardDto) {
             return trelloFacade.createCard(trelloCardDto);
         }
-
     }
